@@ -1,7 +1,7 @@
 {
   "name": "Water Department Inventory",
   "short_name": "Water Dept",
-  "description": "City of Philadelphia Water Department inventory system",
+  "description": "City of Forest Water Department inventory system",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1C2B1E",
