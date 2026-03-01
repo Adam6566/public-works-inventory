@@ -668,7 +668,7 @@ html, body {
 
   <!-- HEADER -->
   <header class="header">
-    <h1 id="header-title">⚙️ Public Works Inventory</h1>
+    <h1 id="header-title">Water Department Inventory</h1>
     <div class="header-actions">
       <button class="header-btn" id="btn-scan-header" title="Scan">📷</button>
       <button class="header-btn" id="btn-add-header" title="Add Item">＋</button>
@@ -776,28 +776,7 @@ html, body {
       <div style="height:12px"></div>
     </div>
 
-    <!-- SETTINGS PAGE -->
-    <div class="page" id="page-settings">
-      </div>
-
-
-      <div class="card" style="margin-top:12px">
-        <div class="card-header">ℹ️ About<
-        <div class="card-body">
-          <div class="info-row"><span class="info-label">App</span><span class="info-val">Water Department Inventory Adam Taylor</span></div>
-          <div class="info-row"><span class="info-label">Version</span><span class="info-val">City of Forest 1.0</span></div>
-          <div class="info-row"><span class="info-label">Storage</span><span class="info-val">Local (on this device)</span></div>
-        </div>
-      </div>
-
-
-          </p>
-        </div>
-      </div>
-      <div style="height:12px"></div>
-    </div>
-
-  </main>
+  
 
   <!-- TAB BAR -->
   <nav class="tab-bar">
@@ -813,12 +792,6 @@ html, body {
     <button class="tab-btn" data-tab="reports">
       <span class="tab-icon">📊</span>Reports
     </button>
-    <button class="tab-btn" data-tab="settings">
-      <span class="tab-icon">⚙</span>Settings
-    </button>
-  </nav>
-</div>
-
 <!-- ─── ITEM DETAIL SLIDE-IN ──────────────────────────────── -->
 <div class="detail-page" id="detail-page">
   <div class="detail-header">
@@ -1194,7 +1167,6 @@ function switchTab(tab) {
     inventory: '📦 Inventory',
     scan: '📷 Scan Barcode',
     reports: '📊 Reports',
-    settings: '⚙️ Settings'
   };
   document.getElementById('header-title').textContent = titles[tab] || '';
 
