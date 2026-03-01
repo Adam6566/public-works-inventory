@@ -1,2 +1,2 @@
-# public-works-inventory
-City inventory tacking app
+# Inventory
+Water Dept. Inventory
