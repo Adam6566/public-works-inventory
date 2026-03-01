@@ -1,6 +1,6 @@
 {
-  "name": "Public Works Inventory",
-  "short_name": "PW Inventory",
+  "name": "Water DepartmentInventory",
+  "short_name": "Inventory",
   "description": "City inventory tracking with QR barcodes, usage averages, and work order logging",
   "start_url": "/",
   "display": "standalone",
