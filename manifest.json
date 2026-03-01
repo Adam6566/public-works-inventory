@@ -1,24 +1,14 @@
 {
-  "name": "Water DepartmentInventory",
-  "short_name": "Inventory",
-  "description": "City inventory tracking with QR barcodes, usage averages, and work order logging",
+  "name": "Water Department Inventory",
+  "short_name": "Water Dept",
+  "description": "City of Philadelphia Water Department inventory system",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1a3a5c",
-  "theme_color": "#1a3a5c",
+  "background_color": "#1C2B1E",
+  "theme_color": "#1C2B1E",
   "orientation": "portrait",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }
