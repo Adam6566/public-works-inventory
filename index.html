@@ -543,6 +543,49 @@ body::before{
 .empty-title{font-family:var(--serif);font-size:18px;color:var(--stone2)}
 .empty-sub{font-size:14px;margin-top:6px;font-family:var(--body)}
 
+/* ── Scan Mode Buttons ────────────────────────────────── */
+.scan-mode-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:12px 8px;border-radius:12px;border:2px solid var(--border);
+  background:var(--cream);cursor:pointer;font-family:var(--ui);
+  font-size:13px;font-weight:600;color:var(--mist2);transition:all .2s;
+}
+.scan-mode-btn.active{
+  background:var(--stone);color:#fff;border-color:var(--stone);
+  box-shadow:0 4px 14px rgba(28,43,30,.25);
+}
+.scan-lookup{
+  margin-top:12px;padding:14px;background:var(--parch);
+  border-radius:10px;border:1px solid var(--border);
+}
+
+/* ── Lookup Result Card ───────────────────────────────── */
+.lookup-source{
+  font-size:10px;font-family:var(--ui);color:var(--mist);
+  text-transform:uppercase;letter-spacing:1px;
+  background:var(--teal-lt);color:var(--teal);
+  padding:3px 8px;border-radius:20px;display:inline-block;margin-bottom:10px;
+}
+.lookup-field{
+  display:flex;flex-direction:column;gap:4px;margin-bottom:12px;
+}
+.lookup-field label{
+  font-size:11px;font-weight:700;color:var(--mist);
+  text-transform:uppercase;letter-spacing:.8px;font-family:var(--ui);
+}
+.lookup-field input,.lookup-field select,.lookup-field textarea{
+  padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:15px;font-family:var(--body);color:var(--stone);
+  background:rgba(255,255,255,.7);-webkit-appearance:none;
+}
+.lookup-field input:focus,.lookup-field select:focus,.lookup-field textarea:focus{
+  outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(27,122,110,.12);
+}
+.lookup-field textarea{min-height:60px;resize:vertical}
+.lookup-not-found{
+  text-align:center;padding:24px 16px;
+}
+.lookup-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 /* Print */
 #print-area{display:none}
 @media print{body>*{display:none !important}#print-area{display:block !important}@page{margin:.5in}}
@@ -604,7 +647,7 @@ body::before{
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="dash-hero">
-        <div class="dash-hero-title">💧 Good day!</div>
+        <div class="dash-hero-title">💧 Questions call Adam </div>
         <div class="stats-row">
           <div class="stat-card">
             <div class="stat-icon">🔩</div>
@@ -637,8 +680,27 @@ body::before{
 
     <!-- SCAN -->
     <div class="page" id="page-scan">
-      <div class="card" style="margin-top:12px">
-        <div class="card-hdr">📷 Scan Item Barcode</div>
+      <!-- Mode toggle -->
+      <div style="display:flex;gap:10px;padding:12px 12px 0">
+        <button class="scan-mode-btn active" id="mode-find" onclick="setScanMode('find')">
+          <span style="font-size:20px">🔍</span>
+          <span>Find Existing</span>
+        </button>
+        <button class="scan-mode-btn" id="mode-add" onclick="setScanMode('add')">
+          <span style="font-size:20px">➕</span>
+          <span>Scan to Add New</span>
+        </button>
+      </div>
+
+      <!-- Mode description -->
+      <div id="scan-mode-desc" style="margin:8px 12px 0;padding:10px 14px;
+        border-radius:10px;font-size:13px;font-family:var(--ui);
+        background:var(--teal-lt);color:var(--teal);border:1px solid #6EC4B4">
+        🔍 Scan an item already in your inventory to view or update it.
+      </div>
+
+      <div class="card" style="margin-top:10px">
+        <div class="card-hdr" id="scan-card-hdr">📷 Scan Item Barcode</div>
         <div class="card-body">
           <div class="scanner-wrap">
             <div id="qr-reader"></div>
@@ -646,10 +708,24 @@ body::before{
           </div>
           <div class="scan-ok" id="scan-ok"></div>
           <div class="scan-err" id="scan-err-el"></div>
+          <div class="scan-lookup" id="scan-lookup" style="display:none">
+            <div class="spinner-ring" style="width:32px;height:32px;border-width:3px;margin:0 auto 8px"></div>
+            <div style="font-size:13px;color:var(--mist);text-align:center;font-family:var(--ui)" id="scan-lookup-msg">Searching product databases…</div>
+          </div>
           <button class="btn btn-primary btn-full" id="btn-start-scan" style="margin-top:12px">📷 Start Camera</button>
           <button class="btn btn-ghost btn-full" id="btn-stop-scan" style="margin-top:8px;display:none">⏹ Stop Camera</button>
         </div>
       </div>
+
+      <!-- Scan to Add tip -->
+      <div id="scan-add-tip" style="display:none;margin:10px 12px 0;padding:12px 14px;
+        border-radius:10px;font-size:13px;font-family:var(--ui);line-height:1.6;
+        background:var(--copper-lt);color:var(--copper);border:1px solid #E8C090">
+        💡 <strong>How it works:</strong> Point your camera at any product barcode — from a box, bag, or label.
+        The app searches online databases automatically and fills in the product details for you.
+        You just confirm and set your starting quantity.
+      </div>
+
       <div style="height:12px"></div>
     </div>
 
@@ -901,6 +977,19 @@ body::before{
       <button class="btn btn-ghost" id="m-pdf-cancel">Cancel</button>
       <button class="btn btn-teal" id="m-pdf-import">📦 Add Selected to Inventory</button>
     </div>
+  </div>
+</div>
+
+<!-- Barcode Lookup / Add New Item Modal -->
+<div class="overlay" id="ov-lookup">
+  <div class="modal" style="max-height:95dvh">
+    <div class="modal-handle"></div>
+    <div class="modal-hdr">
+      <span class="modal-title" id="m-lookup-title">Product Found</span>
+      <button class="modal-close" id="m-lookup-close">✕</button>
+    </div>
+    <div class="modal-body" id="m-lookup-body"></div>
+    <div class="modal-foot" id="m-lookup-foot"></div>
   </div>
 </div>
 
@@ -1376,9 +1465,37 @@ document.getElementById('btn-print-lbl').addEventListener('click',()=>{
 });
 
 // ════════════════════════════════════════════════════════
-//  SCANNER
+//  SCAN MODE & SCANNER
 // ════════════════════════════════════════════════════════
-let scanner=null,scanRunning=false;
+let scanner=null,scanRunning=false,scanMode='find';
+
+function setScanMode(mode){
+  scanMode=mode;
+  document.getElementById('mode-find').classList.toggle('active',mode==='find');
+  document.getElementById('mode-add').classList.toggle('active',mode==='add');
+  const desc=document.getElementById('scan-mode-desc');
+  const tip=document.getElementById('scan-add-tip');
+  const hdr=document.getElementById('scan-card-hdr');
+  if(mode==='find'){
+    desc.style.background='var(--teal-lt)';desc.style.color='var(--teal)';
+    desc.style.borderColor='#6EC4B4';
+    desc.textContent='🔍 Scan an item already in your inventory to view or update it.';
+    hdr.textContent='📷 Scan Inventory Barcode';
+    tip.style.display='none';
+  } else {
+    desc.style.background='var(--copper-lt)';desc.style.color='var(--copper)';
+    desc.style.borderColor='#E8C090';
+    desc.textContent='➕ Scan any product barcode to look it up online and add it to inventory.';
+    hdr.textContent='📷 Scan Product to Add';
+    tip.style.display='block';
+  }
+  // Clear results
+  document.getElementById('scan-ok').className='scan-ok';
+  document.getElementById('scan-err-el').className='scan-err';
+  document.getElementById('scan-lookup').style.display='none';
+  if(scanRunning) stopScan();
+}
+
 document.getElementById('btn-start-scan').addEventListener('click',startScan);
 document.getElementById('btn-stop-scan').addEventListener('click',stopScan);
 document.getElementById('btn-scan-hdr').addEventListener('click',()=>{switchTab('scan');setTimeout(startScan,300);});
@@ -1387,17 +1504,22 @@ function startScan(){
   if(scanRunning)return;
   document.getElementById('scan-ok').className='scan-ok';
   document.getElementById('scan-err-el').className='scan-err';
+  document.getElementById('scan-lookup').style.display='none';
   if(!scanner)scanner=new Html5Qrcode('qr-reader');
-  scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:200,height:200}},
-    code=>{scanRunning=false;scanner.stop().catch(()=>{});
+  scanner.start({facingMode:'environment'},{fps:10,qrbox:{width:220,height:220}},
+    code=>{
+      scanRunning=false;scanner.stop().catch(()=>{});
       document.getElementById('btn-start-scan').style.display='';
       document.getElementById('btn-stop-scan').style.display='none';
-      handleScan(code);},()=>{}
-  ).then(()=>{scanRunning=true;
+      if(scanMode==='find') handleScanFind(code);
+      else handleScanAdd(code);
+    },()=>{}
+  ).then(()=>{
+    scanRunning=true;
     document.getElementById('btn-start-scan').style.display='none';
     document.getElementById('btn-stop-scan').style.display='';
   }).catch(err=>{
-    document.getElementById('scan-err-el').textContent='⚠️ Camera error: '+err;
+    document.getElementById('scan-err-el').textContent='⚠️ Camera error. Please allow camera access and try again.';
     document.getElementById('scan-err-el').className='scan-err show';
   });
 }
@@ -1406,13 +1528,288 @@ function stopScan(){
   document.getElementById('btn-start-scan').style.display='';
   document.getElementById('btn-stop-scan').style.display='none';
 }
-function handleScan(code){
+
+// Find existing item in inventory
+function handleScanFind(code){
   const it=items.find(i=>i.barcode===code);
   const ok=document.getElementById('scan-ok'),er=document.getElementById('scan-err-el');
-  if(it){ok.textContent='✅ Found: '+it.name;ok.className='scan-ok show';
-    setTimeout(()=>{ok.className='scan-ok';openDetail(it.id);},800);}
-  else{er.textContent='❌ No item found for this barcode';er.className='scan-err show';
-    setTimeout(()=>er.className='scan-err',3000);}
+  if(it){
+    ok.textContent='✅ Found: '+it.name;ok.className='scan-ok show';
+    setTimeout(()=>{ok.className='scan-ok';openDetail(it.id);},800);
+  } else {
+    er.innerHTML='❌ Not found in your inventory.<br><span style="font-size:12px">Switch to <strong>Scan to Add New</strong> mode to look it up online.</span>';
+    er.className='scan-err show';
+    setTimeout(()=>er.className='scan-err',4000);
+  }
+}
+
+// ════════════════════════════════════════════════════════
+//  BARCODE LOOKUP — ONLINE PRODUCT SEARCH
+// ════════════════════════════════════════════════════════
+let lookupBarcode='';
+
+async function handleScanAdd(code){
+  lookupBarcode=code;
+
+  // Check if already in inventory
+  const existing=items.find(i=>i.barcode===code);
+  if(existing){
+    const ok=document.getElementById('scan-ok');
+    ok.textContent='ℹ️ Already in inventory: '+existing.name;ok.className='scan-ok show';
+    setTimeout(()=>{ok.className='scan-ok';openDetail(existing.id);},1200);
+    return;
+  }
+
+  // Show lookup spinner
+  document.getElementById('scan-lookup').style.display='block';
+  document.getElementById('scan-lookup-msg').textContent='Searching product databases…';
+
+  let product=null;
+
+  // ── Step 1: UPCItemDB (fast, works for many general products) ──
+  try{
+    const r=await fetch(`https://api.upcitemdb.com/prod/trial/lookup?upc=${encodeURIComponent(code)}`);
+    const d=await r.json();
+    if(d.items&&d.items.length>0){
+      const it=d.items[0];
+      product={
+        name: it.title||'',
+        brand: it.brand||'',
+        description: it.description||(it.brand?it.brand+' '+it.title:''),
+        category: guessCategory(it.title+' '+(it.category||'')+' '+(it.brand||'')),
+        unit: guessUnit(it.title||''),
+        part: code,
+        cost: it.offers&&it.offers.length?parseFloat(it.offers[0].price)||null:null,
+        source:'UPC Item Database',
+      };
+    }
+  }catch(e){}
+
+  // ── Step 2: Open Food Facts (for food/chem products) ──
+  if(!product){
+    try{
+      document.getElementById('scan-lookup-msg').textContent='Checking product catalog…';
+      const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json`);
+      const d=await r.json();
+      if(d.status===1&&d.product){
+        const p=d.product;
+        const name=(p.product_name||p.product_name_en||'').trim();
+        if(name){
+          product={
+            name: name+(p.brands?' — '+p.brands:''),
+            brand: p.brands||'',
+            description: p.generic_name||p.brands||'',
+            category: guessCategory(name+' '+(p.categories||'')),
+            unit: guessUnit(name),
+            part: p.code||code,
+            cost: null,
+            source:'Open Product Database',
+          };
+        }
+      }
+    }catch(e){}
+  }
+
+  // ── Step 3: Claude AI Web Search (most powerful — finds industrial/water dept supplies) ──
+  if(!product){
+    try{
+      document.getElementById('scan-lookup-msg').textContent='Searching online with AI… (may take 15–20 sec)';
+      const r=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:600,
+          tools:[{type:'web_search_20250305',name:'web_search'}],
+          system:`You are a product lookup assistant for a water department inventory system.
+Given a UPC/EAN barcode number, search for the product and return a JSON object ONLY with these fields:
+- name: full product name (string)
+- brand: manufacturer/brand (string, empty if unknown)  
+- description: brief 1-sentence description (string)
+- category: exactly one of: "Chemicals & Fluids","Electrical","Hardware & Fasteners","Meters & Equipment","Pipe & Fittings","Pumps & Parts","Safety Supplies","Tools","Other"
+- unit: unit of measure like "each","feet","lbs","gallons","boxes","rolls" (string)
+- part: part number if found, otherwise the barcode (string)
+- cost: unit price as number or null
+Return ONLY valid JSON, no markdown, no explanation. If product cannot be identified, return {"name":"","notFound":true}`,
+          messages:[{role:'user',content:`Look up this barcode and return product JSON: ${code}`}]
+        })
+      });
+      const d=await r.json();
+      const text=(d.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+      const clean=text.replace(/```json|```/g,'').trim();
+      const parsed=JSON.parse(clean);
+      if(parsed&&parsed.name&&!parsed.notFound){
+        product={...parsed,source:'AI Web Search'};
+      }
+    }catch(e){}
+  }
+
+  // Hide spinner
+  document.getElementById('scan-lookup').style.display='none';
+
+  // Show result modal
+  openLookupModal(code,product);
+}
+
+// Guess category from product text
+function guessCategory(text){
+  const t=(text||'').toLowerCase();
+  if(/chlorine|chemical|bleach|disinfect|acid|alkali|reagent|solvent|lubricant|grease|oil|fluid/.test(t)) return 'Chemicals & Fluids';
+  if(/wire|cable|electrical|breaker|switch|outlet|conduit|junction|fuse|transformer/.test(t)) return 'Electrical';
+  if(/bolt|nut|screw|washer|anchor|fastener|hardware|fitting|coupling|valve|clamp|bracket/.test(t)) return 'Hardware & Fasteners';
+  if(/meter|gauge|sensor|monitor|flow|pressure|reader|tester|detector/.test(t)) return 'Meters & Equipment';
+  if(/pipe|pvc|hdpe|cpvc|copper pipe|tubing|hose|elbow|tee|reducer|nipple/.test(t)) return 'Pipe & Fittings';
+  if(/pump|motor|impeller|seal|gasket|bearing|shaft|cartridge/.test(t)) return 'Pumps & Parts';
+  if(/safety|glove|goggle|helmet|vest|respirator|harness|boot|ppe/.test(t)) return 'Safety Supplies';
+  if(/tool|wrench|drill|saw|hammer|shovel|pick|rake|level|tape/.test(t)) return 'Tools';
+  return 'Other';
+}
+
+// Guess unit from product text
+function guessUnit(text){
+  const t=(text||'').toLowerCase();
+  if(/gallon|gal/.test(t)) return 'gallons';
+  if(/lbs|pound|lb/.test(t)) return 'lbs';
+  if(/kg|kilogram/.test(t)) return 'kg';
+  if(/feet|foot|ft|linear/.test(t)) return 'feet';
+  if(/roll/.test(t)) return 'rolls';
+  if(/bag/.test(t)) return 'bags';
+  if(/box|boxes|case|pack/.test(t)) return 'boxes';
+  if(/sheet/.test(t)) return 'sheets';
+  if(/liter|litre/.test(t)) return 'liters';
+  return 'each';
+}
+
+// ── Lookup Result Modal ────────────────────────────────
+function openLookupModal(code,product){
+  document.getElementById('ov-lookup').classList.add('open');
+
+  if(!product||!product.name){
+    // Not found — show manual entry form
+    document.getElementById('m-lookup-title').textContent='Enter Product Details';
+    document.getElementById('m-lookup-body').innerHTML=`
+      <div class="lookup-not-found">
+        <div style="font-size:42px;margin-bottom:10px">🔍</div>
+        <div style="font-family:var(--serif);font-size:17px;color:var(--stone);margin-bottom:6px">Product Not Found Online</div>
+        <div style="font-size:13px;color:var(--mist);font-family:var(--ui);margin-bottom:16px;line-height:1.5">
+          We searched multiple databases but couldn't find this barcode.<br>
+          Fill in the details below to add it manually.
+        </div>
+        <div style="text-align:left;background:var(--parch2);border-radius:8px;padding:10px 12px;
+          font-size:12px;font-family:monospace;color:var(--mist);margin-bottom:16px">
+          Barcode: ${code}
+        </div>
+      </div>
+      ${lookupFormHTML({part:code})}`;
+    document.getElementById('m-lookup-foot').innerHTML=`
+      <button class="btn btn-ghost" onclick="closeLookupModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmLookupAdd('${code}')">📦 Add to Inventory</button>`;
+  } else {
+    // Found — show pre-filled editable form
+    document.getElementById('m-lookup-title').textContent='Product Found — Review & Add';
+    document.getElementById('m-lookup-body').innerHTML=`
+      <div style="margin-bottom:14px">
+        <div class="lookup-source">✅ Source: ${product.source}</div>
+        <div style="font-size:13px;color:var(--mist2);font-family:var(--ui)">
+          Review the details below, make any changes, then tap Add to Inventory.
+        </div>
+      </div>
+      ${lookupFormHTML(product,code)}`;
+    document.getElementById('m-lookup-foot').innerHTML=`
+      <button class="btn btn-ghost" onclick="closeLookupModal()">Cancel</button>
+      <button class="btn btn-teal" onclick="confirmLookupAdd('${code}')">📦 Add to Inventory</button>`;
+  }
+}
+
+function lookupFormHTML(product,barcode){
+  const catOptions=['Chemicals & Fluids','Electrical','Hardware & Fasteners',
+    'Meters & Equipment','Pipe & Fittings','Pumps & Parts','Safety Supplies','Tools','Other']
+    .map(c=>`<option${c===(product.category||'Other')?' selected':''}>${c}</option>`).join('');
+  const unitOptions=['each','lbs','kg','gallons','liters','feet','bags','boxes','rolls','sheets','tons']
+    .map(u=>`<option${u===(product.unit||'each')?' selected':''}>${u}</option>`).join('');
+  return `
+    <div class="lookup-field">
+      <label>Item Name *</label>
+      <input id="lk-name" value="${(product.name||'').replace(/"/g,'&quot;')}" placeholder="Product name">
+    </div>
+    <div class="lookup-row2">
+      <div class="lookup-field">
+        <label>Category</label>
+        <select id="lk-cat">${catOptions}</select>
+      </div>
+      <div class="lookup-field">
+        <label>Unit</label>
+        <select id="lk-unit">${unitOptions}</select>
+      </div>
+    </div>
+    <div class="lookup-field">
+      <label>Description</label>
+      <textarea id="lk-desc" placeholder="Brief description…">${product.description||''}</textarea>
+    </div>
+    <div class="lookup-row2">
+      <div class="lookup-field">
+        <label>Starting Qty</label>
+        <input id="lk-qty" type="number" min="0" step="0.1" value="0" placeholder="0">
+      </div>
+      <div class="lookup-field">
+        <label>Min Alert Qty</label>
+        <input id="lk-min" type="number" min="0" step="0.1" value="0" placeholder="0">
+      </div>
+    </div>
+    <div class="lookup-field">
+      <label>Location in Warehouse</label>
+      <input id="lk-loc" placeholder="e.g. Warehouse A, Shelf 3">
+    </div>
+    <div class="lookup-field">
+      <label>Vendor / Brand</label>
+      <input id="lk-vendor" value="${(product.brand||'').replace(/"/g,'&quot;')}" placeholder="Vendor or brand name">
+    </div>
+    <div class="lookup-row2">
+      <div class="lookup-field">
+        <label>Part / Catalog #</label>
+        <input id="lk-part" value="${(product.part||barcode||'').replace(/"/g,'&quot;')}" placeholder="Part number">
+      </div>
+      <div class="lookup-field">
+        <label>Cost per Unit ($)</label>
+        <input id="lk-cost" type="number" min="0" step="0.01" value="${product.cost||''}" placeholder="0.00">
+      </div>
+    </div>`;
+}
+
+function confirmLookupAdd(barcode){
+  const name=document.getElementById('lk-name').value.trim();
+  if(!name){toast('⚠️ Item name is required');return;}
+  const newItem={
+    id:uid(),
+    barcode: barcode||genBC(name),
+    transactions:[],
+    created:new Date().toISOString(),
+    name,
+    category:document.getElementById('lk-cat').value,
+    unit:document.getElementById('lk-unit').value,
+    location:document.getElementById('lk-loc').value,
+    desc:document.getElementById('lk-desc').value,
+    photo:null,
+    vendor:document.getElementById('lk-vendor').value,
+    phone:'',email:'',
+    part:document.getElementById('lk-part').value,
+    cost:parseFloat(document.getElementById('lk-cost').value)||null,
+    qty:parseFloat(document.getElementById('lk-qty').value)||0,
+    min:parseFloat(document.getElementById('lk-min').value)||0,
+  };
+  items.push(newItem);
+  save(ITEMS_KEY,items);
+  closeLookupModal();
+  toast('✅ '+name+' added to inventory!');
+  if(currentTab==='dashboard')renderDash();
+  if(currentTab==='inventory')renderInv();
+  // Open the item detail so they can see it
+  setTimeout(()=>openDetail(newItem.id),400);
+}
+
+function closeLookupModal(){
+  document.getElementById('ov-lookup').classList.remove('open');
+  lookupBarcode='';
 }
 
 // ════════════════════════════════════════════════════════
@@ -1707,7 +2104,7 @@ document.getElementById('m-pdf-import').addEventListener('click',()=>{
 // ════════════════════════════════════════════════════════
 //  CLOSE OVERLAYS ON BACKGROUND TAP
 // ════════════════════════════════════════════════════════
-['ov-item','ov-tx','ov-barcode','ov-user','ov-pdf'].forEach(id=>{
+['ov-item','ov-tx','ov-barcode','ov-user','ov-pdf','ov-lookup'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{
     if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');
   });
