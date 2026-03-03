@@ -543,6 +543,51 @@ body::before{
 .empty-title{font-family:var(--serif);font-size:18px;color:var(--stone2)}
 .empty-sub{font-size:14px;margin-top:6px;font-family:var(--body)}
 
+/* ── Central Pipe Catalog ─────────────────────────────── */
+.cp-cat-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.cp-cat-btn{
+  background:var(--parch);border:1.5px solid var(--border);border-radius:10px;
+  padding:10px 6px;font-size:11px;font-family:var(--ui);font-weight:600;
+  color:var(--stone2);cursor:pointer;text-align:center;line-height:1.5;
+  transition:all .15s;
+}
+.cp-cat-btn:active,.cp-cat-btn.active{background:var(--stone);color:#fff;border-color:var(--stone);}
+.cp-product-card{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:12px;border:1.5px solid var(--border);border-radius:12px;
+  margin-bottom:8px;background:var(--cream);cursor:pointer;transition:all .15s;
+}
+.cp-product-card.selected{border-color:var(--teal);background:var(--teal-lt);}
+.cp-product-card:active{transform:scale(.98);}
+.cp-product-img{
+  width:56px;height:56px;border-radius:8px;flex-shrink:0;
+  background:var(--parch2);display:flex;align-items:center;justify-content:center;
+  font-size:26px;border:1px solid var(--border);overflow:hidden;
+}
+.cp-product-img img{width:100%;height:100%;object-fit:cover;border-radius:8px;}
+.cp-product-info{flex:1;min-width:0;}
+.cp-product-name{font-family:var(--serif);font-size:14px;color:var(--stone);font-weight:600;line-height:1.3;}
+.cp-product-item{font-size:11px;color:var(--copper);font-family:var(--ui);font-weight:700;margin-top:2px;}
+.cp-product-desc{font-size:12px;color:var(--mist);font-family:var(--ui);margin-top:3px;line-height:1.4;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.cp-check{width:22px;height:22px;border-radius:6px;flex-shrink:0;
+  border:2px solid var(--border);background:#fff;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;margin-top:2px;}
+.cp-product-card.selected .cp-check{background:var(--teal);border-color:var(--teal);color:#fff;font-size:13px;}
+.cp-product-card.selected .cp-check::after{content:'\2713';font-weight:700;}
+.cp-add-bar{
+  position:sticky;bottom:calc(var(--tab-h) + 8px);
+  background:linear-gradient(135deg,var(--stone),var(--stone2));
+  border-radius:14px;padding:14px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 8px 24px rgba(28,43,30,.35);
+  border:1px solid var(--copper);margin-top:12px;
+}
+.cp-add-bar-text{color:#fff;font-family:var(--serif);font-size:15px;}
+.cp-add-bar-sub{color:rgba(255,255,255,.6);font-size:11px;font-family:var(--ui);}
+
 /* ── Scan Mode Buttons ────────────────────────────────── */
 .scan-mode-btn{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
@@ -647,7 +692,7 @@ body::before{
     <!-- DASHBOARD -->
     <div class="page active" id="page-dashboard">
       <div class="dash-hero">
-        <div class="dash-hero-title">💧 Questions call Adam </div>
+        <div class="dash-hero-title">💧 Good day!</div>
         <div class="stats-row">
           <div class="stat-card">
             <div class="stat-icon">🔩</div>
@@ -753,6 +798,44 @@ body::before{
 
     <!-- ADMIN -->
     <div class="page" id="page-admin">
+
+      <!-- Central Pipe Catalog -->
+      <div class="card" style="margin-top:12px">
+        <div class="card-hdr" style="justify-content:space-between">
+          <span>🏭 Central Pipe Supply Catalog</span>
+          <span style="font-size:11px;color:var(--mist);font-family:var(--ui)">centralpipe.com</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size:14px;color:var(--stone2);margin-bottom:14px;font-family:var(--body);line-height:1.5">
+            Search or browse Central Pipe's catalog. Select products to add directly to your inventory.
+          </p>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <div style="position:relative;flex:1">
+              <span style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none">🔍</span>
+              <input class="f-input" id="cp-search-input" placeholder="e.g. water meter, PVC pipe, valve…"
+                style="padding-left:36px" onkeydown="if(event.key==='Enter')doCPSearch()">
+            </div>
+            <button class="btn btn-primary" id="btn-cp-search" onclick="doCPSearch()" style="flex:none;padding:10px 16px">Search</button>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--mist);text-transform:uppercase;letter-spacing:1px;font-family:var(--ui);margin-bottom:8px">Browse by Category</div>
+          <div class="cp-cat-grid">
+            <button class="cp-cat-btn" onclick="doCPCategory('PVC Pipe and Fittings')">🔧<br>PVC Pipe &amp; Fittings</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Polyethylene Pipe and Fittings')">🟡<br>PE Pipe &amp; Fittings</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Steel Pipe and Fittings')">⚙️<br>Steel Pipe</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Valves water works')">🚰<br>Valves</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Water Meters and Meter Boxes')">⏱️<br>Meters &amp; Boxes</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Post Hydrants and Fire Hydrants')">🧯<br>Hydrants</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Tapping Machines and Tapping Sleeves')">🔩<br>Tapping Equipment</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Pipe Repair Clamps and Couplings')">🛠️<br>Pipe Repair</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Stainless Steel Pipe and Fittings')">✨<br>Stainless Steel</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Copper Pipe and Fittings water service')">🟤<br>Copper</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Ductile Iron Fittings waterworks')">🏗️<br>Ductile Iron</button>
+            <button class="cp-cat-btn" onclick="doCPCategory('Safety Supplies water department')">🦺<br>Safety</button>
+          </div>
+          <div id="cp-results" style="margin-top:14px"></div>
+        </div>
+      </div>
+
       <!-- PDF Import Card -->
       <div class="card" style="margin-top:12px">
         <div class="card-hdr">📄 Import from Vendor PDF Catalog</div>
@@ -2111,6 +2194,137 @@ document.getElementById('m-pdf-import').addEventListener('click',()=>{
 });
 
 // Service worker
+
+// ════════════════════════════════════════════════════════
+//  CENTRAL PIPE SUPPLY CATALOG
+// ════════════════════════════════════════════════════════
+let cpProducts=[],cpSelected=new Set(),cpActiveCategory='';
+
+function doCPSearch(){
+  const q=document.getElementById('cp-search-input').value.trim();
+  if(!q){toast('Enter a search term');return;}
+  document.querySelectorAll('.cp-cat-btn').forEach(b=>b.classList.remove('active'));
+  runCPLookup(q,'search');
+}
+
+function doCPCategory(cat){
+  cpActiveCategory=cat;
+  document.getElementById('cp-search-input').value='';
+  document.querySelectorAll('.cp-cat-btn').forEach(b=>b.classList.toggle('active',
+    b.getAttribute('onclick')&&b.getAttribute('onclick').includes(cat.replace(/'/g,"\\'"))));
+  runCPLookup(cat,'category');
+}
+
+async function runCPLookup(query,mode){
+  cpProducts=[];cpSelected=new Set();
+  const el=document.getElementById('cp-results');
+  el.innerHTML=`<div style="text-align:center;padding:28px 16px">
+    <div class="spinner-ring" style="margin:0 auto 12px"></div>
+    <div style="font-family:var(--serif);font-size:16px;color:var(--stone);margin-bottom:6px">Searching Central Pipe catalog…</div>
+    <div style="font-size:12px;color:var(--mist);font-family:var(--ui)">Connecting to centralpipe.com · This takes about 20 seconds</div>
+    </div>`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:4000,
+        tools:[{type:'web_search_20250305',name:'web_search'}],
+        system:`You are a product catalog assistant for a water department inventory system. Search centralpipe.com for the requested products and return a JSON array only. Each object must have: name (string), itemNumber (Central Pipe item # string or empty), description (1-2 sentences), category (one of: "Chemicals & Fluids","Electrical","Hardware & Fasteners","Meters & Equipment","Pipe & Fittings","Pumps & Parts","Safety Supplies","Tools","Other"), unit (each/feet/lbs/gallons/boxes etc), cost (number or null), url (centralpipe.com product URL or empty), imageUrl (direct image URL or empty), vendor ("Central Pipe Supply"), brand (manufacturer name or empty). Return 8-15 products as raw JSON array only. No markdown.`,
+        messages:[{role:'user',content:mode==='search'
+          ?`Search centralpipe.com for: "${query}" — find matching products with item numbers, descriptions, and prices. Return JSON array only.`
+          :`Browse centralpipe.com for category: "${query}" — list products available with item numbers and prices. Return JSON array only.`}]
+      })});
+    const data=await r.json();
+    if(data.error)throw new Error(data.error.message);
+    const text=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+    const clean=text.replace(/```json|```/gi,'').trim();
+    cpProducts=JSON.parse(clean);
+    if(!Array.isArray(cpProducts)||!cpProducts.length)throw new Error('No products found');
+    renderCPResults();
+  }catch(err){
+    el.innerHTML=`<div style="text-align:center;padding:24px;color:var(--mist);font-family:var(--ui)">
+      <div style="font-size:36px;margin-bottom:10px">&#9888;&#65039;</div>
+      <div style="font-size:14px;color:var(--stone2);margin-bottom:6px">Could not load results</div>
+      <div style="font-size:12px;line-height:1.5">${err.message.includes('No products')?
+        'No products matched that search. Try a different keyword.':
+        'Check your internet connection and try again.'}</div>
+      <button class="btn btn-ghost" style="margin-top:14px" onclick="document.getElementById('cp-results').innerHTML=''">Dismiss</button>
+      </div>`;
+    console.error('CP lookup:',err);
+  }
+}
+
+function cpCatEmoji(cat){
+  return({'Chemicals & Fluids':'&#129514;','Electrical':'&#9889;','Hardware & Fasteners':'&#128297;',
+    'Meters & Equipment':'&#9200;','Pipe & Fittings':'&#128295;','Pumps & Parts':'&#9881;&#65039;',
+    'Safety Supplies':'&#129678;','Tools':'&#128296;'})[cat]||'&#128230;';
+}
+
+function cpProductCardHTML(p,i){
+  const sel=cpSelected.has(i);
+  const already=items.some(it=>it.part===p.itemNumber&&p.itemNumber);
+  const imgHTML=p.imageUrl
+    ?`<div class="cp-product-img"><img src="${p.imageUrl}" alt="" onerror="this.parentElement.innerHTML=\'${cpCatEmoji(p.category)}\'"></div>`
+    :`<div class="cp-product-img">${cpCatEmoji(p.category)}</div>`;
+  return `<div class="cp-product-card${sel?' selected':''}" onclick="cpToggle(${i})">
+    ${imgHTML}
+    <div class="cp-product-info">
+      <div class="cp-product-name">${p.name||'Unknown Product'}</div>
+      ${p.itemNumber?`<div class="cp-product-item">Item #${p.itemNumber}${p.brand?' &middot; '+p.brand:''}</div>`:''}
+      ${p.description?`<div class="cp-product-desc">${p.description}</div>`:''}
+      <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;align-items:center">
+        ${p.cost?`<span style="font-family:var(--serif);font-size:13px;color:var(--teal);font-weight:700">$${Number(p.cost).toFixed(2)}/${p.unit||'ea'}</span>`:''}
+        <span style="font-size:10px;background:var(--parch2);color:var(--mist);padding:1px 6px;border-radius:4px;font-family:var(--ui)">${p.category}</span>
+        ${already?`<span style="font-size:10px;background:var(--green-lt);color:var(--green);padding:1px 6px;border-radius:4px;font-family:var(--ui);font-weight:700">&#10003; In Inventory</span>`:''}
+      </div>
+    </div>
+    <div class="cp-check"></div>
+  </div>`;
+}
+
+function renderCPResults(){
+  const el=document.getElementById('cp-results');
+  if(!cpProducts.length){el.innerHTML='<div style="text-align:center;padding:20px;color:var(--mist);font-family:var(--ui)">No products found.</div>';return;}
+  const selCount=cpSelected.size;
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:13px;font-family:var(--ui);color:var(--mist)">${cpProducts.length} products found</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="cpSelectAll(true)">Select All</button>
+        <button class="btn btn-ghost btn-sm" onclick="cpSelectAll(false)">Clear</button>
+      </div>
+    </div>
+    ${cpProducts.map((p,i)=>cpProductCardHTML(p,i)).join('')}
+    ${selCount>0?`<div class="cp-add-bar">
+      <div><div class="cp-add-bar-text">${selCount} item${selCount!==1?'s':''} selected</div>
+      <div class="cp-add-bar-sub">All added with qty = 0</div></div>
+      <button class="btn btn-copper" onclick="cpAddSelected()" style="flex:none;padding:12px 20px;font-size:14px">&#128230; Add to Inventory</button>
+      </div>`:''}`;
+}
+
+function cpToggle(i){cpSelected.has(i)?cpSelected.delete(i):cpSelected.add(i);renderCPResults();}
+function cpSelectAll(v){v?cpProducts.forEach((_,i)=>cpSelected.add(i)):cpSelected.clear();renderCPResults();}
+
+function cpAddSelected(){
+  const toAdd=Array.from(cpSelected).map(i=>cpProducts[i]).filter(Boolean);
+  if(!toAdd.length){toast('Select at least one item');return;}
+  let added=0,skipped=0;
+  toAdd.forEach(p=>{
+    if(p.itemNumber&&items.some(it=>it.part===p.itemNumber)){skipped++;return;}
+    items.push({id:uid(),barcode:genBC(p.name||'item'),transactions:[],
+      created:new Date().toISOString(),name:p.name||'Unnamed',
+      category:p.category||'Other',unit:p.unit||'each',location:'',
+      desc:p.description||'',photo:null,vendor:'Central Pipe Supply',
+      phone:'1-800-844-7700',email:'',part:p.itemNumber||'',
+      cost:p.cost||null,qty:0,min:0});
+    added++;
+  });
+  save(ITEMS_KEY,items);cpSelected.clear();renderCPResults();
+  toast(`Added ${added} item${added!==1?'s':''}${skipped?' ('+skipped+' already in inventory)':''}!`,3000);
+  if(currentTab==='dashboard')renderDash();
+  if(currentTab==='inventory')renderInv();
+}
+
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
